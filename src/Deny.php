@@ -41,11 +41,13 @@ class Deny
      */
     public function getDenyList(): array
     {
-        if (!file_exists($this->deny_list_path)) {
+        if (!file_exists($this->getDenyPath())) {
             $this->clearDenyList();
         }
 
-        return file($this->deny_list_path) ?? throw new \Exception("Could not open deny list at path: {$this->deny_list_path}");
+        $deny_list = file($this->getDenyPath());
+
+        return is_array($deny_list) ? $deny_list : throw new \Exception("Could not open deny list at path: {$this->deny_list_path}");
     }
     
     /**
@@ -60,7 +62,7 @@ class Deny
             throw new \Exception("Invalid IP or CIDR notation: {$ip}");
         }
 
-        file_put_contents($this->getDenyPath(), "deny {$ip};" . PHP_EOL, FILE_APPEND) ?? throw new \Exception("Could write deny list at path: {$this->getDenyPath()}");
+        file_put_contents($this->getDenyPath(), "deny {$ip};" . PHP_EOL, FILE_APPEND) ? true : throw new \Exception("Could write deny list at path: {$this->getDenyPath()}");
 
         return true;
     }
@@ -78,7 +80,7 @@ class Deny
             return trim($line) !== "deny {$ip};";
         });
 
-        file_put_contents($this->getDenyPath(), implode(PHP_EOL, $deny_list)) ?? throw new \Exception("Could write updated deny list at path: {$this->getDenyPath()}");
+        file_put_contents($this->getDenyPath(), implode(PHP_EOL, $deny_list)) ? true : throw new \Exception("Could write updated deny list at path: {$this->getDenyPath()}");
 
         return true;
     }
@@ -90,7 +92,7 @@ class Deny
      */
     public function clearDenyList(): bool
     {
-        file_put_contents($this->getDenyPath(), '') ?? throw new \Exception("Could clear deny list entry at path: {$this->getDenyPath()}");
+        file_put_contents($this->getDenyPath(), '') ? true : throw new \Exception("Could clear deny list entry at path: {$this->getDenyPath()}");
 
         return true;
     }
