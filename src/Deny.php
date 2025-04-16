@@ -37,7 +37,7 @@ class Deny
     /**
      * getDenyList
      *
-     * @return array
+     * @return array<string>
      */
     public function getDenyList(): array
     {
