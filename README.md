@@ -1,0 +1,2 @@
+# waffy
+Nginx denylist
