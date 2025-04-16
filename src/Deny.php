@@ -52,22 +52,26 @@ class Deny
      * addDeny
      *
      * @param  string $ip
-     * @return self
+     * @return bool
      */
-    public function addDeny(string $ip): self
+    public function addDeny(string $ip): bool
     {
+        if(!$this->isValidCidr($ip)) {
+            throw new \Exception("Invalid IP or CIDR notation: {$ip}");
+        }
+
         file_put_contents($this->getDenyPath(), "deny {$ip};" . PHP_EOL, FILE_APPEND) ?? throw new \Exception("Could write deny list at path: {$this->getDenyPath()}");
 
-        return $this;
+        return true;
     }
     
     /**
      * removeDeny
      *
      * @param  string $ip
-     * @return self
+     * @return bool
      */
-    public function removeDeny(string $ip): self
+    public function removeDeny(string $ip): bool
     {
         $deny_list = $this->getDenyList();
         $deny_list = array_filter($deny_list, function ($line) use ($ip) {
@@ -76,19 +80,19 @@ class Deny
 
         file_put_contents($this->getDenyPath(), implode(PHP_EOL, $deny_list)) ?? throw new \Exception("Could write updated deny list at path: {$this->getDenyPath()}");
 
-        return $this;
+        return true;
     }
     
     /**
      * clearDenyList
      *
-     * @return self
+     * @return bool
      */
-    public function clearDenyList(): self
+    public function clearDenyList(): bool
     {
         file_put_contents($this->getDenyPath(), '') ?? throw new \Exception("Could clear deny list entry at path: {$this->getDenyPath()}");
 
-        return $this;
+        return true;
     }
 
     public function isValidIp(string $ip): bool
